@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Evaluator;
+namespace Sbludufunk\Randown\Evaluator\Intraclasses;
 
 interface Objecto
 {

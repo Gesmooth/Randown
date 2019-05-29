@@ -59,9 +59,9 @@ class Tokenizer
             "\\*   ([0-9]+)   \\}"
         ];
 
-        $this->_patterns[] = [SeparatorToken::CLASS, "\\|", "\\|"];
-        $this->_patterns[] = [BlockStartToken::CLASS,   "\\{", "\\{"];
-        $this->_patterns[] = [BlockEndToken::CLASS,     "\\}", "\\}"];
+        $this->_patterns[] = [SeparatorToken::CLASS,  "\\|", "\\|"];
+        $this->_patterns[] = [BlockStartToken::CLASS, "\\{", "\\{"];
+        $this->_patterns[] = [BlockEndToken::CLASS,   "\\}", "\\}"];
 
         $this->_splitPattern = implode("|", array_column($this->_patterns, 1));
     }
@@ -90,6 +90,16 @@ class Tokenizer
             $tokens[] = new TextToken($rawToken);
         }
 
-        return $tokens;
+        $whitespaceFreeTokens = [];
+        foreach($tokens as $token){
+            if(
+                $token instanceof TextToken &&
+                preg_match("/^\s+$/xsD", $token->text()) === 1
+            );else{
+                $whitespaceFreeTokens[] = $token;
+            }
+        }
+
+        return $whitespaceFreeTokens;
     }
 }

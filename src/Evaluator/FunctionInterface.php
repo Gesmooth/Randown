@@ -2,7 +2,9 @@
 
 namespace Sbludufunk\Randown\Evaluator;
 
+use Sbludufunk\Randown\Evaluator\Intraclasses\Objecto;
+
 interface FunctionInterface
 {
-    public function invoke(Concatenation ...$arguments): Objecto;
+    public function invoke(Objecto ...$arguments): Objecto;
 }
