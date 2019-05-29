@@ -1,6 +1,5 @@
 <?php declare(strict_types = 1);
 
-use ReflectionClass as RC;
 use Sbludufunk\Randown\DebuggingTokenStream;
 use Sbludufunk\Randown\Evaluator\Concatenation;
 use Sbludufunk\Randown\Evaluator\Engine;
