@@ -3,9 +3,11 @@
 namespace Sbludufunk\Randown\Evaluator;
 
 use Exception;
-use Sbludufunk\Randown\Evaluator\Bag;
-use Sbludufunk\Randown\Evaluator\OptionBag;
-use Sbludufunk\Randown\Evaluator\Text;
+use Sbludufunk\Randown\Evaluator\Intraclasses\Bag;
+use Sbludufunk\Randown\Evaluator\Intraclasses\Concatenation;
+use Sbludufunk\Randown\Evaluator\Intraclasses\Objecto;
+use Sbludufunk\Randown\Evaluator\Intraclasses\Rando;
+use Sbludufunk\Randown\Evaluator\Intraclasses\Text;
 use Sbludufunk\Randown\Nodes\ArgumentNode;
 use Sbludufunk\Randown\Nodes\ArgumentsNode;
 use Sbludufunk\Randown\Nodes\FunctionCallNode;
@@ -30,9 +32,18 @@ class Engine
         $this->_functions[$name] = $function;
     }
 
+    public function registerVariable(String $variableName, Objecto $value){
+        // @TODO verify valid var name
+        $this->_variables[$variableName] = $value;
+    }
+
+    public function evaluate(Array $nodes): String{
+        return (String)$this->evaluateConcatenation($nodes);
+    }
+
     /** @throws Exception */
-    public function evaluateConcatenation(Array $nodes){
-        $concatenation = [];
+    public function evaluateConcatenation(Array $nodes): ?Objecto{
+        $buffer = [];
         foreach($nodes as $node){
             $item =
                 $this->evaluateText($node) ??
@@ -41,13 +52,13 @@ class Engine
                 $this->evaluateFunctionCall($node) ??
                 NULL;
             assert($item !== NULL);
-            $concatenation[] = $item;
+            $buffer[] = $item;
         }
-        return new Concatenation($concatenation);
+        return count($buffer) === 1 ? $buffer[0] : new Concatenation($buffer);
     }
 
     /** @throws Exception */
-    public function evaluateText($node){
+    public function evaluateText($node): ?Objecto{
         if(!$node instanceof TextNode){ return NULL; }
         $text = new Text($node->unescape());
         return $this->evaluateMethodCalls($text, $node->methodCalls());
@@ -77,12 +88,12 @@ class Engine
     public function evaluateRandoCall($node): ?Objecto{
         if(!$node instanceof RandoCallNode){ return NULL; }
         $arguments = $this->evaluateArguments($node->arguments());
-        $opt = new OptionBag(new Bag($arguments));
+        $opt = new Rando(new Bag($arguments));
         return $this->evaluateMethodCalls($opt, $node->methodCalls());
     }
 
     /** @throws Exception */
-    public function evaluateMethodCalls(Objecto $thisValue, array $methodCalls){
+    public function evaluateMethodCalls(Objecto $thisValue, array $methodCalls): Objecto{
         /** @var MethodCallNode[] $methodCalls */
         if($methodCalls === []){ return $thisValue; }
         $methodCallNode = array_shift($methodCalls);

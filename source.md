@@ -1,1 +1,4 @@
-hello @var{Come \{ sempre | {Come sempre | Anche oggi | Come ogni settimana}}} bar
+@var{data| {MSI|Asus|Acer|Sony|Toshiba|HP|Apple}}
+
+
+$data$

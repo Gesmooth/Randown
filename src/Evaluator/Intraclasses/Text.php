@@ -1,7 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Evaluator;
+namespace Sbludufunk\Randown\Evaluator\Intraclasses;
 
+use Error;
 use function mb_strtoupper;
 
 class Text implements Objecto
@@ -20,5 +21,6 @@ class Text implements Objecto
         if($name === "upperCase"){
             return new Text(mb_strtoupper($this->_text));
         }
+        throw new Error("Method $name does not exist");
     }
 }
