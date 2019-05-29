@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\DS;
+namespace Sbludufunk\Randown\Evaluator;
 
 class Bag
 {

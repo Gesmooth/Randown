@@ -2,9 +2,9 @@
 
 namespace Sbludufunk\Randown\Evaluator;
 
-interface Value
+interface Objecto
 {
     public function __toString(): String;
 
-    public function invoke(String $name, Array $arguments): Value;
+    public function invoke(String $name, Array $arguments): Objecto;
 }

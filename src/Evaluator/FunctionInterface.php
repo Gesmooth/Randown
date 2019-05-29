@@ -4,5 +4,5 @@ namespace Sbludufunk\Randown\Evaluator;
 
 interface FunctionInterface
 {
-    public function __invoke(Concatenation ...$arguments): Value;
+    public function invoke(Concatenation ...$arguments): Objecto;
 }

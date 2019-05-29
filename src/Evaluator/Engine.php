@@ -3,9 +3,9 @@
 namespace Sbludufunk\Randown\Evaluator;
 
 use Exception;
-use Sbludufunk\Randown\DS\Bag;
-use Sbludufunk\Randown\DS\OptionBag;
-use Sbludufunk\Randown\DS\Text;
+use Sbludufunk\Randown\Evaluator\Bag;
+use Sbludufunk\Randown\Evaluator\OptionBag;
+use Sbludufunk\Randown\Evaluator\Text;
 use Sbludufunk\Randown\Nodes\ArgumentNode;
 use Sbludufunk\Randown\Nodes\ArgumentsNode;
 use Sbludufunk\Randown\Nodes\FunctionCallNode;
@@ -16,7 +16,7 @@ use Sbludufunk\Randown\Nodes\VariableNode;
 
 class Engine
 {
-    /** @var Value[] */
+    /** @var Objecto[] */
     private $_functions;
 
     private $_variables;
@@ -54,7 +54,7 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateVariable($node): ?Value{
+    public function evaluateVariable($node): ?Objecto{
         if(!$node instanceof VariableNode){ return NULL; }
         $thisValue = $this->_variables[$node->token()->name()] ?? NULL;
         if($thisValue === NULL){ throw new UndefinedVariable($nodes, $node); }
@@ -62,19 +62,19 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateFunctionCall($node): ?Value{
+    public function evaluateFunctionCall($node): ?Objecto{
         if(!$node instanceof FunctionCallNode){ return NULL; }
         $functionName = $node->token()->name();
         $function = $this->_functions[$functionName] ?? NULL;
         if($function === NULL){ throw new UndefinedFunction($nodes, $node); }
         /** @var FunctionInterface $function */
         $arguments = $this->evaluateArguments($node->arguments());
-        $result = $function->__invoke(...$arguments);
+        $result = $function->invoke(...$arguments);
         return $this->evaluateMethodCalls($result, $node->methodCalls());
     }
 
     /** @throws Exception */
-    public function evaluateRandoCall($node): ?Value{
+    public function evaluateRandoCall($node): ?Objecto{
         if(!$node instanceof RandoCallNode){ return NULL; }
         $arguments = $this->evaluateArguments($node->arguments());
         $opt = new OptionBag(new Bag($arguments));
@@ -82,7 +82,7 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateMethodCalls(Value $thisValue, array $methodCalls){
+    public function evaluateMethodCalls(Objecto $thisValue, array $methodCalls){
         /** @var MethodCallNode[] $methodCalls */
         if($methodCalls === []){ return $thisValue; }
         $methodCallNode = array_shift($methodCalls);
