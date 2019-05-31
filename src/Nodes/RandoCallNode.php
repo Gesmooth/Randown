@@ -8,10 +8,7 @@ class RandoCallNode implements ObjectNode
 
     private $_methodCalls;
 
-    public function __construct(
-        ArgumentsNode $arguments,
-        Array $methodCalls
-    ){
+    public function __construct(ArgumentsNode $arguments, Array $methodCalls){
         $this->_arguments = $arguments;
         $this->_methodCalls = $methodCalls;
     }

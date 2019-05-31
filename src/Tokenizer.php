@@ -2,12 +2,12 @@
 
 namespace Sbludufunk\Randown;
 
-use Sbludufunk\Randown\Tokens\SeparatorToken;
 use Sbludufunk\Randown\Tokens\BlockEndToken;
 use Sbludufunk\Randown\Tokens\BlockStartToken;
 use Sbludufunk\Randown\Tokens\EscapeToken;
 use Sbludufunk\Randown\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokens\MethodCallToken;
+use Sbludufunk\Randown\Tokens\SeparatorToken;
 use Sbludufunk\Randown\Tokens\TextToken;
 use Sbludufunk\Randown\Tokens\VariableToken;
 use function array_column;

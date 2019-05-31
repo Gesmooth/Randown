@@ -3,11 +3,11 @@
 namespace Sbludufunk\Randown\Evaluator;
 
 use Exception;
-use Sbludufunk\Randown\Evaluator\Intraclasses\Bag;
-use Sbludufunk\Randown\Evaluator\Intraclasses\Concatenation;
-use Sbludufunk\Randown\Evaluator\Intraclasses\Objecto;
-use Sbludufunk\Randown\Evaluator\Intraclasses\Rando;
-use Sbludufunk\Randown\Evaluator\Intraclasses\Text;
+use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\BagClass;
+use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\ConcatClass;
+use Sbludufunk\Randown\Evaluator\Classes\Objecto;
+use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\RandoClass;
+use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
 use Sbludufunk\Randown\Nodes\ArgumentNode;
 use Sbludufunk\Randown\Nodes\ArgumentsNode;
 use Sbludufunk\Randown\Nodes\FunctionCallNode;
@@ -15,6 +15,8 @@ use Sbludufunk\Randown\Nodes\MethodCallNode;
 use Sbludufunk\Randown\Nodes\RandoCallNode;
 use Sbludufunk\Randown\Nodes\TextNode;
 use Sbludufunk\Randown\Nodes\VariableNode;
+use TypeError;
+use function is_a;
 
 class Engine
 {
@@ -26,6 +28,26 @@ class Engine
     public function __construct(){
         $this->_functions = [];
         $this->_variables = [];
+    }
+
+    public function registerClass(String $variableName, String $className){
+        if(!is_a($className, Objecto::CLASS, TRUE)){
+            throw new TypeError();
+        }
+
+        $this->registerFunction($variableName, new class(
+            $className
+        ) implements FunctionInterface{
+            private $_className;
+
+            public function __construct(String $className){
+                $this->_className = $className;
+            }
+
+            public function invoke(Objecto ...$arguments): Objecto{
+                return new $this->_className(...$arguments);
+            }
+        });
     }
 
     public function registerFunction(String $name, FunctionInterface $function){
@@ -42,7 +64,7 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateConcatenation(Array $nodes): ?Objecto{
+    private function evaluateConcatenation(Array $nodes): ?Objecto{
         $buffer = [];
         foreach($nodes as $node){
             $item =
@@ -54,30 +76,30 @@ class Engine
             assert($item !== NULL);
             $buffer[] = $item;
         }
-        return count($buffer) === 1 ? $buffer[0] : new Concatenation($buffer);
+        return count($buffer) === 1 ? $buffer[0] : new ConcatClass($buffer);
     }
 
     /** @throws Exception */
-    public function evaluateText($node): ?Objecto{
+    private function evaluateText($node): ?Objecto{
         if(!$node instanceof TextNode){ return NULL; }
-        $text = new Text($node->unescape());
+        $text = new TextClass($node->unescape());
         return $this->evaluateMethodCalls($text, $node->methodCalls());
     }
 
     /** @throws Exception */
-    public function evaluateVariable($node): ?Objecto{
+    private function evaluateVariable($node): ?Objecto{
         if(!$node instanceof VariableNode){ return NULL; }
         $thisValue = $this->_variables[$node->token()->name()] ?? NULL;
-        if($thisValue === NULL){ throw new UndefinedVariable($nodes, $node); }
+        if($thisValue === NULL){ throw new UndefinedVariable([], $node); }
         return $this->evaluateMethodCalls($thisValue, $node->methodCalls());
     }
 
     /** @throws Exception */
-    public function evaluateFunctionCall($node): ?Objecto{
+    private function evaluateFunctionCall($node): ?Objecto{
         if(!$node instanceof FunctionCallNode){ return NULL; }
         $functionName = $node->token()->name();
         $function = $this->_functions[$functionName] ?? NULL;
-        if($function === NULL){ throw new UndefinedFunction($nodes, $node); }
+        if($function === NULL){ throw new UndefinedFunction([], $node); }
         /** @var FunctionInterface $function */
         $arguments = $this->evaluateArguments($node->arguments());
         $result = $function->invoke(...$arguments);
@@ -85,15 +107,15 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateRandoCall($node): ?Objecto{
+    private function evaluateRandoCall($node): ?Objecto{
         if(!$node instanceof RandoCallNode){ return NULL; }
         $arguments = $this->evaluateArguments($node->arguments());
-        $opt = new Rando(new Bag($arguments));
+        $opt = new RandoClass(new BagClass($arguments));
         return $this->evaluateMethodCalls($opt, $node->methodCalls());
     }
 
     /** @throws Exception */
-    public function evaluateMethodCalls(Objecto $thisValue, array $methodCalls): Objecto{
+    private function evaluateMethodCalls(Objecto $thisValue, array $methodCalls): Objecto{
         /** @var MethodCallNode[] $methodCalls */
         if($methodCalls === []){ return $thisValue; }
         $methodCallNode = array_shift($methodCalls);
@@ -105,7 +127,7 @@ class Engine
     }
 
     /** @throws Exception */
-    public function evaluateArguments(ArgumentsNode $arguments): array{
+    private function evaluateArguments(ArgumentsNode $arguments): array{
         $actualArguments = [];
         foreach($arguments->toArray() as $argument){
             /** @var ArgumentNode $argument */

@@ -1,22 +1,18 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Evaluator\Intraclasses;
+namespace Sbludufunk\Randown\Evaluator\Classes\PublicConstructors;
 
-use Error;
 use Iterator;
 use IteratorAggregate;
+use Sbludufunk\Randown\Evaluator\Classes\Objecto;
 
-class Bag implements Objecto, IteratorAggregate
+class BagClass extends Objecto implements IteratorAggregate
 {
     /** @var Objecto[] */
     private $_storage;
 
-    public function __construct(Iterable $elements){
-        $this->_storage = [];
-        foreach($elements as $element){
-            assert($element instanceof Objecto);
-            $this->_storage[] = $element;
-        }
+    public function __construct(Objecto ...$elements){
+        $this->_storage = $elements;
     }
 
     /** @return Objecto[] */
@@ -32,10 +28,6 @@ class Bag implements Objecto, IteratorAggregate
         foreach($this->_storage as $element){
             yield $element;
         }
-    }
-
-    public function invoke(String $name, array $arguments): Objecto{
-        throw new Error("Method $name does not exist");
     }
 
     public function __toString(): String{

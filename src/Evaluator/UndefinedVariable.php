@@ -8,6 +8,6 @@ use Sbludufunk\Randown\Nodes\VariableNode;
 class UndefinedVariable extends Exception
 {
     public function __construct(Array $nodes, VariableNode $node){
-        parent::__construct("BLA");
+        parent::__construct($node->token()->name());
     }
 }

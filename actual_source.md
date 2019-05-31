@@ -12,7 +12,7 @@
 @var{rinomate             | {rinomate | celebri | stimate | famose}}
 @var{agenzie              | {agenzie | compagnie | organizzazioni}}
 @var{infosecurity         | {sicurezza informatica | infosecurity | infosec}
-@var{symantec, kaspersky  | @inc{brands/infosec.php} &shuffle &sub{0 | @int{3|5}} &join{, }}
+@var{symantec, kaspersky  | @inc{brands/infosec.json} &shuffle &sub{0 | @int{3|5}} &join{, }}
 @var{laboratorio e rete-assistenza | @set{laboratorio | rete-assistenza} &shuffle &join{ e }}
 
 $Come sempre$ pubblichiamo la $classifica$ delle principali **$minacce informatiche$**

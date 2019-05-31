@@ -20,7 +20,7 @@ class TextNode implements ObjectNode
         }
 
         foreach($methodCalls as $methodCall){
-            assert($methodCall instanceof MethodCallToken);
+            assert($methodCall instanceof MethodCallNode);
         }
 
         $this->_pieces = $pieces;
