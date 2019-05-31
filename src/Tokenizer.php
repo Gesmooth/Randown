@@ -9,7 +9,7 @@ use Sbludufunk\Randown\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokens\SeparatorToken;
 use Sbludufunk\Randown\Tokens\TextToken;
-use Sbludufunk\Randown\Tokens\VariableToken;
+use Sbludufunk\Randown\Tokens\ReferenceToken;
 use function array_column;
 use function preg_match;
 use const PREG_SPLIT_NO_EMPTY;
@@ -25,26 +25,26 @@ class Tokenizer
 
         $this->_patterns[] = [
             EscapeToken::CLASS,
-            "\\\\    [\\\\{}@*|&]",
-            "\\\\   ([\\\\{}@*|&])"
+            "\\\\    [\\\\{}@*|&$]", // TODO add $
+            "\\\\   ([\\\\{}@*|&$])"
         ];
 
         $this->_patterns[] = [
-            VariableToken::CLASS,
+            ReferenceToken::CLASS,
             "\\$    .*?    \\$",
             "\\$   (.*?)   \\$"
         ];
 
         $this->_patterns[] = [
             FunctionCallToken::CLASS,
-            "@    \\s*     [a-zA-Z_][a-zA-Z0-9_]*     \\s*    \\{",
-            "@   (\\s*)   ([a-zA-Z_][a-zA-Z0-9_]*)   (\\s*)   \\{"
+            " \\s*    \\&    \\s*    \\{",
+            "(\\s*)   \\&   (\\s*)   \\{"
         ];
 
         $this->_patterns[] = [
             MethodCallToken::CLASS,
-            "\\s*     \\&    \\s*     [a-zA-Z_][a-zA-Z0-9_]*     \\s*    \\{",
-            "(\\s*)   \\&   (\\s*)   ([a-zA-Z_][a-zA-Z0-9_]*)   (\\s*)   \\{"
+            " \\s*    \\&    \\s*     ..*?     \\s*    \\{",
+            "(\\s*)   \\&   (\\s*)   (..*?)   (\\s*)   \\{"
         ];
 
         $this->_patterns[] = [
@@ -74,11 +74,7 @@ class Tokenizer
         );
 
         $tokens = [];
-        for(
-            $i = 0, $countTokens = count($rawTokens);
-            $i < $countTokens;
-            $i++
-        ){
+        for($i = 0, $countTokens = count($rawTokens); $i < $countTokens; $i++){
             $rawToken = $rawTokens[$i];
             foreach($this->_patterns as [$class, $splitPattern, $capturePattern]){
                 $bits = [];
@@ -90,16 +86,6 @@ class Tokenizer
             $tokens[] = new TextToken($rawToken);
         }
 
-        $whitespaceFreeTokens = [];
-        foreach($tokens as $token){
-            if(
-                $token instanceof TextToken &&
-                preg_match("/^\s+$/xsD", $token->text()) === 1
-            );else{
-                $whitespaceFreeTokens[] = $token;
-            }
-        }
-
-        return $whitespaceFreeTokens;
+        return $tokens;
     }
 }

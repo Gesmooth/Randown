@@ -6,42 +6,47 @@ class MethodCallToken implements Token
 {
     private $_wsBeforeAmp;
 
-    private $_wsBefore;
+    private $_wsBeforeName;
 
     private $_name;
 
-    private $_wsAfter;
+    private $_wsAfterName;
 
-    public function __construct(String $wsBeforeAmp, String $wsBefore, String $name, String $wsAfter){
+    public function __construct(
+        String $wsBeforeAmp,
+        String $wsBeforeName,
+        String $name,
+        String $wsAfterName
+    ){
         $this->_wsBeforeAmp = $wsBeforeAmp;
-        $this->_wsBefore = $wsBefore;
+        $this->_wsBeforeName = $wsBeforeName;
         $this->_name = $name;
-        $this->_wsAfter = $wsAfter;
+        $this->_wsAfterName = $wsAfterName;
     }
 
     public function whitespaceBeforeAmpersand(): String{
         return $this->_wsBeforeAmp;
     }
 
-    public function whitespaceBefore(): String{
-        return $this->_wsBefore;
+    public function whitespaceBeforeName(): String{
+        return $this->_wsBeforeName;
     }
 
     public function name(): String{
         return $this->_name;
     }
 
-    public function whitespaceAfter(): String{
-        return $this->_wsAfter;
+    public function whitespaceAfterName(): String{
+        return $this->_wsAfterName;
     }
 
     public function __toString(): String{
         return
             $this->_wsBeforeAmp .
             "&" .
-            $this->_wsBefore .
+            $this->_wsBeforeName .
             $this->_name .
-            $this->_wsAfter .
+            $this->_wsAfterName .
             "{";
     }
 }

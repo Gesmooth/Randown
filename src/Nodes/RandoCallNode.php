@@ -6,22 +6,22 @@ class RandoCallNode implements ObjectNode
 {
     private $_arguments;
 
-    private $_methodCalls;
+    private $_calls;
 
-    public function __construct(ArgumentsNode $arguments, Array $methodCalls){
+    public function __construct(ArgumentsNode $arguments, Array $calls){
         $this->_arguments = $arguments;
-        $this->_methodCalls = $methodCalls;
-    }
-
-    public function __toString(): String{
-        return "{" . $this->_arguments . implode("", $this->_methodCalls);
+        $this->_calls = $calls;
     }
 
     public function arguments(): ArgumentsNode{
         return $this->_arguments;
     }
 
-    public function methodCalls(): array{
-        return $this->_methodCalls;
+    public function calls(): array{
+        return $this->_calls;
+    }
+
+    public function __toString(): String{
+        return "{" . $this->_arguments . implode("", $this->_calls);
     }
 }

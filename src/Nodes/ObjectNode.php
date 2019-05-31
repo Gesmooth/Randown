@@ -4,5 +4,5 @@ namespace Sbludufunk\Randown\Nodes;
 
 interface ObjectNode extends Node
 {
-    public function methodCalls(): array;
+    public function calls(): array;
 }

@@ -20,15 +20,18 @@ $tokens = $tokenizer->tokenize($source);
 
 foreach($tokens as $token){
     $cn = (new RC($token))->getShortName();
-    //echo str_pad($cn, 30);
-    //var_dump((String)$token);
+    echo str_pad($cn, 30);
+    var_dump((String)$token);
 }
+
+
+exit();
 
 $parser = new Parser();
 $nodes = $parser->parse(new DebuggingTokenStream($tokens));
 
 $engine = new Engine();
-$engine->registerVariable("seconda settimana di Maggio 2019", new TextClass("LOLLO"));
+$engine->registerReference("seconda settimana di Maggio 2019", new TextClass("LOLLO"));
 $engine->registerClass("int", IntSingleClass::CLASS);
 $engine->registerClass("rint", IntRandomClass::CLASS);
 $engine->registerClass("Seq", SeqClass::CLASS);
@@ -63,7 +66,7 @@ $engine->registerFunction("var", new class($engine) implements FunctionInterface
         assert($variableName instanceof TextClass);
         $normalizedVariableName = preg_replace("/\s+/", " ", (String)$variableName);
         $normalizedVariableName = trim($normalizedVariableName);
-        $this->_engine->registerVariable($normalizedVariableName, $arguments[1]);
+        $this->_engine->registerReference($normalizedVariableName, $arguments[1]);
         return new TextClass("");
     }
 });

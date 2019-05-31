@@ -2,61 +2,35 @@
 
 namespace Sbludufunk\Randown\Evaluator;
 
+use Error;
 use Exception;
-use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\BagClass;
-use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\ConcatClass;
 use Sbludufunk\Randown\Evaluator\Classes\Objecto;
+use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\ConcatClass;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\RandoClass;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
+use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\BagClass;
 use Sbludufunk\Randown\Nodes\ArgumentNode;
 use Sbludufunk\Randown\Nodes\ArgumentsNode;
 use Sbludufunk\Randown\Nodes\FunctionCallNode;
 use Sbludufunk\Randown\Nodes\MethodCallNode;
 use Sbludufunk\Randown\Nodes\RandoCallNode;
 use Sbludufunk\Randown\Nodes\TextNode;
-use Sbludufunk\Randown\Nodes\VariableNode;
-use TypeError;
-use function is_a;
+use Sbludufunk\Randown\Nodes\ReferenceNode;
 
 class Engine
 {
-    /** @var Objecto[] */
-    private $_functions;
-
     private $_variables;
 
     public function __construct(){
-        $this->_functions = [];
         $this->_variables = [];
     }
 
-    public function registerClass(String $variableName, String $className){
-        if(!is_a($className, Objecto::CLASS, TRUE)){
-            throw new TypeError();
-        }
-
-        $this->registerFunction($variableName, new class(
-            $className
-        ) implements FunctionInterface{
-            private $_className;
-
-            public function __construct(String $className){
-                $this->_className = $className;
-            }
-
-            public function invoke(Objecto ...$arguments): Objecto{
-                return new $this->_className(...$arguments);
-            }
-        });
-    }
-
-    public function registerFunction(String $name, FunctionInterface $function){
-        $this->_functions[$name] = $function;
-    }
-
-    public function registerVariable(String $variableName, Objecto $value){
+    public function registerReference(Bool $constant, String $name, Objecto $value){
         // @TODO verify valid var name
-        $this->_variables[$variableName] = $value;
+        if($this->_variables[$name]["constant"] ?? FALSE){
+            throw new Error("Cannot override constant reference $name");
+        }
+        $this->_variables[$name] = ["value" => $value, "constant" => $constant];
     }
 
     public function evaluate(Array $nodes): String{
@@ -83,15 +57,15 @@ class Engine
     private function evaluateText($node): ?Objecto{
         if(!$node instanceof TextNode){ return NULL; }
         $text = new TextClass($node->unescape());
-        return $this->evaluateMethodCalls($text, $node->methodCalls());
+        return $this->evaluateMethodCalls($text, $node->calls());
     }
 
     /** @throws Exception */
     private function evaluateVariable($node): ?Objecto{
-        if(!$node instanceof VariableNode){ return NULL; }
+        if(!$node instanceof ReferenceNode){ return NULL; }
         $thisValue = $this->_variables[$node->token()->name()] ?? NULL;
         if($thisValue === NULL){ throw new UndefinedVariable([], $node); }
-        return $this->evaluateMethodCalls($thisValue, $node->methodCalls());
+        return $this->evaluateMethodCalls($thisValue, $node->calls());
     }
 
     /** @throws Exception */
@@ -111,7 +85,7 @@ class Engine
         if(!$node instanceof RandoCallNode){ return NULL; }
         $arguments = $this->evaluateArguments($node->arguments());
         $opt = new RandoClass(new BagClass($arguments));
-        return $this->evaluateMethodCalls($opt, $node->methodCalls());
+        return $this->evaluateMethodCalls($opt, $node->calls());
     }
 
     /** @throws Exception */
@@ -129,7 +103,7 @@ class Engine
     /** @throws Exception */
     private function evaluateArguments(ArgumentsNode $arguments): array{
         $actualArguments = [];
-        foreach($arguments->toArray() as $argument){
+        foreach($arguments->arguments() as $argument){
             /** @var ArgumentNode $argument */
             $actualArguments[] = $this->evaluateConcatenation($argument->contents());
         }

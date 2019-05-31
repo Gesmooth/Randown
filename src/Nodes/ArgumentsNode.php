@@ -13,16 +13,16 @@ class ArgumentsNode implements Node
         $this->_isTerminated = $isTerminated;
     }
 
-    public function __toString(): String{
-        $terminator = $this->_isTerminated ? "}" : "";
-        return implode("|", $this->_arguments) . $terminator;
-    }
-
-    public function toArray(): array{
+    public function arguments(): array{
         return $this->_arguments;
     }
 
     public function isTerminated(): Bool{
         return $this->_isTerminated;
+    }
+
+    public function __toString(): String{
+        $terminator = $this->_isTerminated ? "}" : "";
+        return implode("|", $this->_arguments) . $terminator;
     }
 }

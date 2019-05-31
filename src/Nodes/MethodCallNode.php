@@ -15,15 +15,15 @@ class MethodCallNode implements Node
         $this->_arguments = $arguments;
     }
 
-    public function __toString(): String{
-        return $this->_token . $this->_arguments;
-    }
-
     public function token(): MethodCallToken{
         return $this->_token;
     }
 
     public function arguments(): ArgumentsNode{
         return $this->_arguments;
+    }
+
+    public function __toString(): String{
+        return $this->_token . $this->_arguments;
     }
 }

@@ -3,48 +3,48 @@
 namespace Sbludufunk\Randown\Nodes;
 
 use Sbludufunk\Randown\Tokens\EscapeToken;
-use Sbludufunk\Randown\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokens\TextToken;
+use function array_reduce;
 
 class TextNode implements ObjectNode
 {
     private $_pieces;
 
-    private $_methodCalls;
+    private $_calls;
 
-    public function __construct(Array $pieces, Array $methodCalls){
+    public function __construct(Array $pieces, Array $calls){
         assert(count($pieces) >= 1);
+
+        // @TODO check that $pieces does not contain adjacent TextTokens
 
         foreach($pieces as $piece){
             assert($piece instanceof TextToken || $piece instanceof EscapeToken);
         }
 
-        foreach($methodCalls as $methodCall){
-            assert($methodCall instanceof MethodCallNode);
+        foreach($calls as $call){
+            assert($call instanceof MethodCallNode || $call instanceof FunctionCallNode);
         }
 
         $this->_pieces = $pieces;
-        $this->_methodCalls = $methodCalls;
-    }
-
-    public function __toString(): String{
-        return implode("", $this->_pieces) . implode("", $this->_methodCalls);
+        $this->_calls = $calls;
     }
 
     public function unescape(): String{
-        $b = "";
-        foreach($this->_pieces as $piece){
-            /** @var EscapeToken|TextToken $piece */
-            $b .= $piece->text();
-        }
-        return $b;
+        return array_reduce($this->_pieces, function(String $carry, $piece){
+            assert($piece instanceof EscapeToken || $piece instanceof TextToken);
+            return $carry . $piece->intendedText();
+        }, "");
     }
 
     public function pieces(): array{
         return $this->_pieces;
     }
 
-    public function methodCalls(): array{
-        return $this->_methodCalls;
+    public function calls(): array{
+        return $this->_calls;
+    }
+
+    public function __toString(): String{
+        return implode("", $this->_pieces) . implode("", $this->_calls);
     }
 }

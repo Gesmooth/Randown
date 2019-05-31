@@ -10,7 +10,7 @@ class TextToken implements Token
         $this->_text = $text;
     }
 
-    public function text(): String{
+    public function intendedText(): String{
         return $this->_text;
     }
 
