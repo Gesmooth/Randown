@@ -4,26 +4,15 @@ namespace Sbludufunk\Randown\Nodes;
 
 use Sbludufunk\Randown\Tokens\FunctionCallToken;
 
-class FunctionCallNode implements ObjectNode
+class FunctionCallNode implements Node
 {
     private $_token;
 
     private $_arguments;
 
-    private $_methodCalls;
-
-    public function __construct(
-        FunctionCallToken $token,
-        ArgumentsNode $arguments,
-        Array $methodCalls
-    ){
+    public function __construct(FunctionCallToken $token, ArgumentsNode $arguments){
         $this->_token = $token;
         $this->_arguments = $arguments;
-        $this->_methodCalls = $methodCalls;
-    }
-
-    public function __toString(): String{
-        return $this->_token . $this->_arguments . implode("", $this->_methodCalls);
     }
 
     public function token(): FunctionCallToken{
@@ -34,7 +23,7 @@ class FunctionCallNode implements ObjectNode
         return $this->_arguments;
     }
 
-    public function methodCalls(): array{
-        return $this->_methodCalls;
+    public function __toString(): String{
+        return $this->_token . $this->_arguments;
     }
 }

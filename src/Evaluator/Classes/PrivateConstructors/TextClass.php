@@ -21,6 +21,10 @@ class TextClass extends Objecto
         return parent::invoke($name, $arguments);
     }
 
+    public function staticize(): Objecto{
+        return new TextClass((String)$this);
+    }
+
     public function __toString(): String{
         return $this->_text;
     }

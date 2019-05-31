@@ -2,7 +2,7 @@
 
 namespace Sbludufunk\Randown\Tokens;
 
-class VariableToken implements Token
+class ReferenceToken implements Token
 {
     private $_name;
 

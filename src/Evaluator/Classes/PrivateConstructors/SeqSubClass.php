@@ -27,7 +27,7 @@ class SeqSubClass extends Objecto
         return (String)$this->finalize();
     }
 
-    private function finalize(){
+    public function staticize(): Objecto{
         $startIndex = (Int)(String)$this->_index;
         $count = (Int)(String)$this->_count;
         return new SeqClass(...array_slice($this->_storage, $startIndex, $count));

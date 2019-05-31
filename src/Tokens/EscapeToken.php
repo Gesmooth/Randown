@@ -10,7 +10,7 @@ class EscapeToken implements Token
         $this->_character = $character;
     }
 
-    public function text(): String{
+    public function intendedText(): String{
         return $this->_character;
     }
 

@@ -12,10 +12,15 @@ class SeqClass extends Objecto
     private $_storage;
 
     public function __construct(Objecto ...$objects){
-        $this->_storage = [];
-        foreach($objects as $object){
-            $this->_storage[] = $object;
+        $this->_storage = $objects;
+    }
+
+    public function staticize(): Objecto{
+        $storage = [];
+        foreach($this->_storage as $element){
+            $storage[] = $element->staticize();
         }
+        return new SeqClass(...$storage);
     }
 
     public function invoke(String $name, Objecto ...$arguments): Objecto{

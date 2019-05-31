@@ -13,6 +13,10 @@ class RandoClass extends Objecto
         $this->_bag = $bag;
     }
 
+    public function staticize(): Objecto{
+        // TODO: Implement staticize() method.
+    }
+
     public function __toString(): String{
         $index = random_int(0, $this->_bag->count() - 1);
         return $this->_bag->toArray()[$index]->__toString();
