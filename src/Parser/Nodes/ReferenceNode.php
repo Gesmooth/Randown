@@ -1,10 +1,10 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Nodes;
+namespace Sbludufunk\Randown\Parser\Nodes;
 
-use Sbludufunk\Randown\Tokens\ReferenceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
 
-class ReferenceNode implements ObjectNode
+class ReferenceNode implements ValidRootNode
 {
     private $_token;
 

@@ -3,7 +3,7 @@
 namespace Sbludufunk\Randown\Evaluator;
 
 use Exception;
-use Sbludufunk\Randown\Nodes\ReferenceNode;
+use Sbludufunk\Randown\Parser\Nodes\ReferenceNode;
 
 class UndefinedVariable extends Exception
 {

@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown;
+namespace Sbludufunk\Randown\Parser;
 
-use Sbludufunk\Randown\Tokens\Token;
+use Sbludufunk\Randown\Tokenizer\Tokens\Token;
 
 class DebuggingTokenStream extends TokenStream
 {

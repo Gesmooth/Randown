@@ -3,7 +3,7 @@
 namespace Sbludufunk\Randown\Evaluator;
 
 use Exception;
-use Sbludufunk\Randown\Nodes\FunctionCallNode;
+use Sbludufunk\Randown\Parser\Nodes\FunctionCallNode;
 
 class UndefinedFunction extends Exception
 {

@@ -1,16 +1,15 @@
 <?php declare(strict_types = 1);
 
 use ReflectionClass as RC;
-use Sbludufunk\Randown\DebuggingTokenStream;
-use Sbludufunk\Randown\Evaluator\Engine;
-use Sbludufunk\Randown\Evaluator\FunctionInterface;
-use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\IntRandomClass;
-use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\IntSingleClass;
 use Sbludufunk\Randown\Evaluator\Classes\Objecto;
-use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\SeqClass;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
-use Sbludufunk\Randown\Parser;
-use Sbludufunk\Randown\Tokenizer;
+use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\SeqClass;
+use Sbludufunk\Randown\Evaluator\Engine;
+use Sbludufunk\Randown\Parser\DebuggingTokenStream;
+use Sbludufunk\Randown\Parser\NodesValidator;
+use Sbludufunk\Randown\Parser\Parser;
+use Sbludufunk\Randown\Tokenizer\Tokenizer;
+use Sbludufunk\Randown\Tokenizer\TokenValidator;
 
 require __DIR__ . "/vendor/autoload.php";
 
@@ -24,11 +23,18 @@ foreach($tokens as $token){
     var_dump((String)$token);
 }
 
-
-exit();
+$tokenValidator = new TokenValidator($tokenizer);
+var_dump($tokenValidator->isTokenSequenceValid($tokens));
 
 $parser = new Parser();
 $nodes = $parser->parse(new DebuggingTokenStream($tokens));
+
+$nodesValidator = new NodesValidator($tokenizer, $parser);
+var_dump($nodesValidator->isNodeSequenceValid($nodes));
+
+exit();
+
+
 
 $engine = new Engine();
 $engine->registerReference("seconda settimana di Maggio 2019", new TextClass("LOLLO"));
