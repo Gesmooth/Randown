@@ -15,7 +15,7 @@ use Sbludufunk\Randown\Tokens\EscapeToken;
 use Sbludufunk\Randown\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokens\ReferenceToken;
-use Sbludufunk\Randown\Tokens\SeparatorToken;
+use Sbludufunk\Randown\Tokens\BlockSeparatorToken;
 use Sbludufunk\Randown\Tokens\TextToken;
 
 class Parser
@@ -95,15 +95,19 @@ class Parser
 
     private function consumeArguments(TokenStream $tokens): ArgumentsNode{
         $arguments = [];
+
         CONSUME_ARGUMENT:
 
         $pieces = [];
+
         CONSUME_PIECE:
+
         $piece =
             $this->consumeReference($tokens) ??
             $this->consumeTextNode($tokens) ??
             $this->consumeRandoCall($tokens);
-        if($piece){
+
+        if($piece !== NULL){
             $pieces[] = $piece;
             goto CONSUME_PIECE;
         }
@@ -112,12 +116,13 @@ class Parser
         assert(
             $token === NULL ||
             $token instanceof BlockEndToken ||
-            $token instanceof SeparatorToken
+            $token instanceof BlockSeparatorToken
         );
         $multiplier = $token === NULL ? NULL : $token->multiplier();
+
         $arguments[] = new ArgumentNode($pieces, $multiplier);
 
-        if($token instanceof SeparatorToken){
+        if($token instanceof BlockSeparatorToken){
             goto CONSUME_ARGUMENT;
         }elseif($token instanceof BlockEndToken){
             return new ArgumentsNode($arguments, TRUE);

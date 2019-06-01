@@ -13,7 +13,7 @@ class ArgumentsNode implements Node
         $this->_isTerminated = $isTerminated;
     }
 
-    public function arguments(): array{
+    public function toArray(): array{
         return $this->_arguments;
     }
 

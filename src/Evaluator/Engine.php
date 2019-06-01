@@ -103,7 +103,7 @@ class Engine
     /** @throws Exception */
     private function evaluateArguments(ArgumentsNode $arguments): array{
         $actualArguments = [];
-        foreach($arguments->arguments() as $argument){
+        foreach($arguments->toArray() as $argument){
             /** @var ArgumentNode $argument */
             $actualArguments[] = $this->evaluateConcatenation($argument->contents());
         }

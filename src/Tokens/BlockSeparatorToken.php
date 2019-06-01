@@ -2,7 +2,7 @@
 
 namespace Sbludufunk\Randown\Tokens;
 
-class SeparatorToken implements Token
+class BlockSeparatorToken implements Token
 {
     private $_multiplier;
 

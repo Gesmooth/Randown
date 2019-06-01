@@ -7,7 +7,7 @@ use Sbludufunk\Randown\Tokens\BlockStartToken;
 use Sbludufunk\Randown\Tokens\EscapeToken;
 use Sbludufunk\Randown\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokens\MethodCallToken;
-use Sbludufunk\Randown\Tokens\SeparatorToken;
+use Sbludufunk\Randown\Tokens\BlockSeparatorToken;
 use Sbludufunk\Randown\Tokens\TextToken;
 use Sbludufunk\Randown\Tokens\ReferenceToken;
 use function array_column;
@@ -48,7 +48,7 @@ class Tokenizer
         ];
 
         $this->_patterns[] = [
-            SeparatorToken::CLASS,
+            BlockSeparatorToken::CLASS,
             "\\*    [0-9]+    \\|",
             "\\*   ([0-9]+)   \\|"
         ];
@@ -59,7 +59,7 @@ class Tokenizer
             "\\*   ([0-9]+)   \\}"
         ];
 
-        $this->_patterns[] = [SeparatorToken::CLASS,  "\\|", "\\|"];
+        $this->_patterns[] = [BlockSeparatorToken::CLASS,  "\\|", "\\|"];
         $this->_patterns[] = [BlockStartToken::CLASS, "\\{", "\\{"];
         $this->_patterns[] = [BlockEndToken::CLASS,   "\\}", "\\}"];
 
