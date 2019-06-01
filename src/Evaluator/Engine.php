@@ -9,13 +9,13 @@ use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\ConcatClass;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\RandoClass;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
 use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\BagClass;
-use Sbludufunk\Randown\Nodes\ArgumentNode;
-use Sbludufunk\Randown\Nodes\ArgumentsNode;
-use Sbludufunk\Randown\Nodes\FunctionCallNode;
-use Sbludufunk\Randown\Nodes\MethodCallNode;
-use Sbludufunk\Randown\Nodes\RandoCallNode;
-use Sbludufunk\Randown\Nodes\TextNode;
-use Sbludufunk\Randown\Nodes\ReferenceNode;
+use Sbludufunk\Randown\Parser\Nodes\ArgumentNode;
+use Sbludufunk\Randown\Parser\Nodes\ArgumentsNode;
+use Sbludufunk\Randown\Parser\Nodes\FunctionCallNode;
+use Sbludufunk\Randown\Parser\Nodes\MethodCallNode;
+use Sbludufunk\Randown\Parser\Nodes\RandoNode;
+use Sbludufunk\Randown\Parser\Nodes\ReferenceNode;
+use Sbludufunk\Randown\Parser\Nodes\TextNode;
 
 class Engine
 {
@@ -82,7 +82,7 @@ class Engine
 
     /** @throws Exception */
     private function evaluateRandoCall($node): ?Objecto{
-        if(!$node instanceof RandoCallNode){ return NULL; }
+        if(!$node instanceof RandoNode){ return NULL; }
         $arguments = $this->evaluateArguments($node->arguments());
         $opt = new RandoClass(new BagClass($arguments));
         return $this->evaluateMethodCalls($opt, $node->calls());

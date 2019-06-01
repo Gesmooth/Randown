@@ -1,22 +1,23 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown;
+namespace Sbludufunk\Randown\Parser;
 
-use Sbludufunk\Randown\Nodes\ArgumentNode;
-use Sbludufunk\Randown\Nodes\ArgumentsNode;
-use Sbludufunk\Randown\Nodes\FunctionCallNode;
-use Sbludufunk\Randown\Nodes\MethodCallNode;
-use Sbludufunk\Randown\Nodes\RandoCallNode;
-use Sbludufunk\Randown\Nodes\TextNode;
-use Sbludufunk\Randown\Nodes\ReferenceNode;
-use Sbludufunk\Randown\Tokens\BlockEndToken;
-use Sbludufunk\Randown\Tokens\BlockStartToken;
-use Sbludufunk\Randown\Tokens\EscapeToken;
-use Sbludufunk\Randown\Tokens\FunctionCallToken;
-use Sbludufunk\Randown\Tokens\MethodCallToken;
-use Sbludufunk\Randown\Tokens\ReferenceToken;
-use Sbludufunk\Randown\Tokens\BlockSeparatorToken;
-use Sbludufunk\Randown\Tokens\TextToken;
+use Sbludufunk\Randown\Parser\Nodes\ArgumentNode;
+use Sbludufunk\Randown\Parser\Nodes\ArgumentsNode;
+use Sbludufunk\Randown\Parser\Nodes\FunctionCallNode;
+use Sbludufunk\Randown\Parser\Nodes\MethodCallNode;
+use Sbludufunk\Randown\Parser\Nodes\RandoNode;
+use Sbludufunk\Randown\Parser\Nodes\ReferenceNode;
+use Sbludufunk\Randown\Parser\Nodes\SyntaxErrorNode;
+use Sbludufunk\Randown\Parser\Nodes\TextNode;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockEndToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockSeparatorToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockStartToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\EscapeToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\FunctionCallToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
 
 class Parser
 {
@@ -27,7 +28,7 @@ class Parser
                 $this->consumeReference($tokens) ??
                 $this->consumeTextNode($tokens) ??
                 $this->consumeRandoCall($tokens) ??
-                $tokens->consume(); // aka syntax error
+                new SyntaxErrorNode($tokens->consume()); // aka syntax error
             $nodes[] = $node;
         }
         return $nodes;
@@ -37,7 +38,7 @@ class Parser
         $pieces = [];
         CONSUME_PIECE:
         $token = $tokens->peek();
-        if($token instanceof TextToken || $token instanceof EscapeToken){
+        if($token instanceof StringToken || $token instanceof EscapeToken){
             $pieces[] = $tokens->consume();
             goto CONSUME_PIECE;
         }
@@ -49,13 +50,13 @@ class Parser
         return new TextNode($pieces, $this->consumeCalls($tokens));
     }
 
-    private function consumeRandoCall(TokenStream $tokens): ?RandoCallNode{
+    private function consumeRandoCall(TokenStream $tokens): ?RandoNode{
         $blockStart = $tokens->peek();
         if(!$blockStart instanceof BlockStartToken){ return NULL; }
         $tokens->consume();
         $arguments = $this->consumeArguments($tokens);
         $calls = $this->consumeCalls($tokens);
-        return new RandoCallNode($arguments, $calls);
+        return new RandoNode($arguments, $calls);
     }
 
     private function consumeReference(TokenStream $tokens): ?ReferenceNode{
@@ -118,9 +119,12 @@ class Parser
             $token instanceof BlockEndToken ||
             $token instanceof BlockSeparatorToken
         );
-        $multiplier = $token === NULL ? NULL : $token->multiplier();
 
-        $arguments[] = new ArgumentNode($pieces, $multiplier);
+
+        $wsBefore = new StringToken("");
+        $wsAfter = new StringToken("");
+
+        $arguments[] = new ArgumentNode($wsBefore, $pieces, $wsAfter);
 
         if($token instanceof BlockSeparatorToken){
             goto CONSUME_ARGUMENT;

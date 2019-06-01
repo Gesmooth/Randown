@@ -1,15 +1,15 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown;
+namespace Sbludufunk\Randown\Tokenizer;
 
-use Sbludufunk\Randown\Tokens\BlockEndToken;
-use Sbludufunk\Randown\Tokens\BlockStartToken;
-use Sbludufunk\Randown\Tokens\EscapeToken;
-use Sbludufunk\Randown\Tokens\FunctionCallToken;
-use Sbludufunk\Randown\Tokens\MethodCallToken;
-use Sbludufunk\Randown\Tokens\BlockSeparatorToken;
-use Sbludufunk\Randown\Tokens\TextToken;
-use Sbludufunk\Randown\Tokens\ReferenceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockEndToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockSeparatorToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\BlockStartToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\EscapeToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\FunctionCallToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
 use function array_column;
 use function preg_match;
 use const PREG_SPLIT_NO_EMPTY;
@@ -25,7 +25,7 @@ class Tokenizer
 
         $this->_patterns[] = [
             EscapeToken::CLASS,
-            "\\\\    [\\\\{}@*|&$]", // TODO add $
+            "\\\\    [\\\\{}@*|&$]",
             "\\\\   ([\\\\{}@*|&$])"
         ];
 
@@ -66,7 +66,7 @@ class Tokenizer
         $this->_splitPattern = implode("|", array_column($this->_patterns, 1));
     }
 
-    public function tokenize(String $document){
+    public function tokenize(String $document): array{
 
         $rawTokens = preg_split(
             "/(" . $this->_splitPattern . ")/xsD", $document, 0,
@@ -83,7 +83,7 @@ class Tokenizer
                     continue 2;
                 }
             }
-            $tokens[] = new TextToken($rawToken);
+            $tokens[] = new StringToken($rawToken);
         }
 
         return $tokens;

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Nodes;
+namespace Sbludufunk\Randown\Parser\Nodes;
 
 class ArgumentsNode implements Node
 {

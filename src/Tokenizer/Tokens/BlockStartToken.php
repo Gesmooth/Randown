@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Tokens;
+namespace Sbludufunk\Randown\Tokenizer\Tokens;
 
 class BlockStartToken implements Token
 {

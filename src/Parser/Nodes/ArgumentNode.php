@@ -1,21 +1,24 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Nodes;
+namespace Sbludufunk\Randown\Parser\Nodes;
+
+use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
 
 class ArgumentNode implements Node
 {
     private $_whitespaceBefore;
+
     private $_contents;
+
     private $_whitespaceAfter;
 
     public function __construct(
-        ?TextNode $whitespaceBefore,
+        ?StringToken $whitespaceBefore,
         Array $contents,
-        ?TextNode $whitespaceAfter
+        ?StringToken $whitespaceAfter
     ){
-        // @TODO check that if $contents is empty, the whitespace must be set in before and never in after
         $this->_whitespaceBefore = $whitespaceBefore;
-        $this->_contents = $contents; // @TODO check must not begin or end with a whitespace TextNode
+        $this->_contents = $contents;
         $this->_whitespaceAfter = $whitespaceAfter;
     }
 
@@ -32,6 +35,9 @@ class ArgumentNode implements Node
     }
 
     public function __toString(): String{
-        return implode("", $this->_contents);
+        return
+            $this->_whitespaceBefore .
+            implode("", $this->_contents) .
+            $this->_whitespaceAfter;
     }
 }

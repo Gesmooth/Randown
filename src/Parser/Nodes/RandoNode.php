@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Nodes;
+namespace Sbludufunk\Randown\Parser\Nodes;
 
-class RandoCallNode implements ObjectNode
+class RandoNode implements ValidRootNode
 {
     private $_arguments;
 

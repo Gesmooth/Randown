@@ -1,8 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace Sbludufunk\Randown\Nodes;
+namespace Sbludufunk\Randown\Parser\Nodes;
 
-use Sbludufunk\Randown\Tokens\MethodCallToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
 
 class MethodCallNode implements Node
 {
