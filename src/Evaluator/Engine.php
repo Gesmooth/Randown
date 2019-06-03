@@ -16,6 +16,7 @@ use Sbludufunk\Randown\Parser\Nodes\MethodCallNode;
 use Sbludufunk\Randown\Parser\Nodes\RandoNode;
 use Sbludufunk\Randown\Parser\Nodes\ReferenceNode;
 use Sbludufunk\Randown\Parser\Nodes\TextNode;
+use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
 
 class Engine
 {
@@ -25,12 +26,16 @@ class Engine
         $this->_variables = [];
     }
 
-    public function registerReference(Bool $constant, String $name, Objecto $value){
-        // @TODO verify valid var name
-        if($this->_variables[$name]["constant"] ?? FALSE){
-            throw new Error("Cannot override constant reference $name");
+    public function registerReference(
+        Bool $constant,
+        ReferenceToken $name,
+        Objecto $value
+    ){
+        $strName = (String)$name->normalize();
+        if($this->_variables[$strName]["constant"] ?? FALSE){
+            throw new Error("Cannot override constant reference \"$strName\"");
         }
-        $this->_variables[$name] = ["value" => $value, "constant" => $constant];
+        $this->_variables[$strName] = ["value" => $value, "constant" => $constant];
     }
 
     public function evaluate(Array $nodes): String{
@@ -72,9 +77,7 @@ class Engine
     private function evaluateFunctionCall($node): ?Objecto{
         if(!$node instanceof FunctionCallNode){ return NULL; }
         $functionName = $node->token()->name();
-        $function = $this->_functions[$functionName] ?? NULL;
         if($function === NULL){ throw new UndefinedFunction([], $node); }
-        /** @var FunctionInterface $function */
         $arguments = $this->evaluateArguments($node->arguments());
         $result = $function->invoke(...$arguments);
         return $this->evaluateMethodCalls($result, $node->methodCalls());

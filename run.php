@@ -1,6 +1,10 @@
 <?php declare(strict_types = 1);
 
 use ReflectionClass as RC;
+use Sbludufunk\Randown\Evaluator\Classes\Functions\IncFunction;
+use Sbludufunk\Randown\Evaluator\Classes\Functions\IntFunction;
+use Sbludufunk\Randown\Evaluator\Classes\Functions\RandoIntFunction;
+use Sbludufunk\Randown\Evaluator\Classes\Functions\VarFunction;
 use Sbludufunk\Randown\Evaluator\Classes\Objecto;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
 use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\SeqClass;
@@ -34,49 +38,14 @@ var_dump($nodesValidator->isNodeSequenceValid($nodes));
 
 exit();
 
-
-
 $engine = new Engine();
-$engine->registerReference("seconda settimana di Maggio 2019", new TextClass("LOLLO"));
-$engine->registerClass("int", IntSingleClass::CLASS);
-$engine->registerClass("rint", IntRandomClass::CLASS);
+$engine->registerReference(TRUE, "seconda settimana di Maggio 2019", new TextClass("LOLLO"));
+$engine->registerReference(TRUE, "int", new IntFunction());
+$engine->registerReference(TRUE, "rint", new RandoIntFunction());
+$engine->registerReference(TRUE, "var", new VarFunction($engine));
+$engine->registerReference(TRUE, "const", new VarFunction($engine));
+$engine->registerReference(TRUE, "inc", new IncFunction());
 $engine->registerClass("Seq", SeqClass::CLASS);
-$engine->registerFunction("inc", new class() implements FunctionInterface{
-    public function invoke(Objecto ...$arguments): Objecto{
-        $file = $arguments[0] ?? NULL;
-        if($file === NULL){ throw new \Error(); }
-        $path = (String)$file;
-        $path = str_replace(["\\", "/"], "/", $path);
-        $pieces = explode("/", $path);
-        foreach($pieces as $piece){
-            if(trim($piece) === ".."){
-                throw new \Error();
-            }
-        }
-        $result = (function($__PATH__){
-            return require(__DIR__ . "/basedir/" . $__PATH__);
-        })($path);
-
-    }
-});
-
-$engine->registerFunction("var", new class($engine) implements FunctionInterface{
-    private $_engine;
-
-    public function __construct(Engine $engine){
-        $this->_engine = $engine;
-    }
-
-    public function invoke(Objecto ...$arguments): Objecto{
-        $variableName = $arguments[0];
-        assert($variableName instanceof TextClass);
-        $normalizedVariableName = preg_replace("/\s+/", " ", (String)$variableName);
-        $normalizedVariableName = trim($normalizedVariableName);
-        $this->_engine->registerReference($normalizedVariableName, $arguments[1]);
-        return new TextClass("");
-    }
-});
-
 echo $engine->evaluate($nodes);
 
 

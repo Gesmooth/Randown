@@ -14,6 +14,10 @@ class ReferenceToken implements Token
         return $this->_name;
     }
 
+    public function normalize(): ReferenceToken{
+        return trim(preg_replace("/\s+/", " ", $this->_name));
+    }
+
     public function __toString(): String{
         return "$" . $this->_name . "$";
     }

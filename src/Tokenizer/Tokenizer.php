@@ -47,21 +47,9 @@ class Tokenizer
             "(\\s*)   \\&   (\\s*)   (..*?)   (\\s*)   \\{"
         ];
 
-        $this->_patterns[] = [
-            BlockSeparatorToken::CLASS,
-            "\\*    [0-9]+    \\|",
-            "\\*   ([0-9]+)   \\|"
-        ];
-
-        $this->_patterns[] = [
-            BlockEndToken::CLASS,
-            "\\*    [0-9]+    \\}",
-            "\\*   ([0-9]+)   \\}"
-        ];
-
-        $this->_patterns[] = [BlockSeparatorToken::CLASS,  "\\|", "\\|"];
-        $this->_patterns[] = [BlockStartToken::CLASS, "\\{", "\\{"];
-        $this->_patterns[] = [BlockEndToken::CLASS,   "\\}", "\\}"];
+        $this->_patterns[] = [BlockSeparatorToken::CLASS, "\\|", "\\|"];
+        $this->_patterns[] = [BlockStartToken::CLASS,     "\\{", "\\{"];
+        $this->_patterns[] = [BlockEndToken::CLASS,       "\\}", "\\}"];
 
         $this->_splitPattern = implode("|", array_column($this->_patterns, 1));
     }
