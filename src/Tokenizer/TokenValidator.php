@@ -24,4 +24,13 @@ class TokenValidator
         $compareTokens = $this->_tokenizer->tokenize($stringifiedTokens);
         return $tokens == $compareTokens;
     }
+
+    public function findFirstInvalidToken(Array $tokens): ?Token{
+        foreach($tokens as $token){
+            if(!$this->isTokenValid($token)){
+                return $token;
+            }
+        }
+        return NULL;
+    }
 }

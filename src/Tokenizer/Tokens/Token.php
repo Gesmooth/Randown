@@ -4,5 +4,7 @@ namespace Sbludufunk\Randown\Tokenizer\Tokens;
 
 interface Token
 {
+    public function newlines(): Int;
+
     public function __toString(): String;
 }

@@ -21,9 +21,9 @@ $source = file_get_contents(__DIR__ . "/source.md");
 $tokenizer = new Tokenizer();
 $tokens = $tokenizer->tokenize($source);
 
-foreach($tokens as $token){
+foreach($tokens as $index => $token){
     $cn = (new RC($token))->getShortName();
-    echo str_pad($cn, 30);
+    echo str_pad($cn, 30) . $index . " - ";
     var_dump((String)$token);
 }
 
