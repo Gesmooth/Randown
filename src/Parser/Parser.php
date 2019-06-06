@@ -6,6 +6,7 @@ use Sbludufunk\Randown\Parser\Nodes\ArgumentNode;
 use Sbludufunk\Randown\Parser\Nodes\ArgumentsNode;
 use Sbludufunk\Randown\Parser\Nodes\FunctionCallNode;
 use Sbludufunk\Randown\Parser\Nodes\MethodCallNode;
+use Sbludufunk\Randown\Parser\Nodes\Node;
 use Sbludufunk\Randown\Parser\Nodes\RandoNode;
 use Sbludufunk\Randown\Parser\Nodes\ReferenceNode;
 use Sbludufunk\Randown\Parser\Nodes\SyntaxErrorNode;
@@ -25,9 +26,9 @@ class Parser
         $nodes = [];
         while($tokens->hasMore()){
             $node =
-                $this->consumeReference($tokens) ??
+                $this->consumeReferenceNode($tokens) ??
                 $this->consumeTextNode($tokens) ??
-                $this->consumeRandoCall($tokens) ??
+                $this->consumeRandoNode($tokens) ??
                 new SyntaxErrorNode($tokens->consume()); // aka syntax error
             $nodes[] = $node;
         }
@@ -50,7 +51,7 @@ class Parser
         return new TextNode($pieces, $this->consumeCalls($tokens));
     }
 
-    private function consumeRandoCall(TokenStream $tokens): ?RandoNode{
+    private function consumeRandoNode(TokenStream $tokens): ?RandoNode{
         $blockStart = $tokens->peek();
         if(!$blockStart instanceof BlockStartToken){ return NULL; }
         $tokens->consume();
@@ -59,7 +60,7 @@ class Parser
         return new RandoNode($arguments, $calls);
     }
 
-    private function consumeReference(TokenStream $tokens): ?ReferenceNode{
+    private function consumeReferenceNode(TokenStream $tokens): ?ReferenceNode{
         $referenceToken = $tokens->peek();
         if(!$referenceToken instanceof ReferenceToken){ return NULL; }
         $tokens->consume();
@@ -99,14 +100,15 @@ class Parser
 
         CONSUME_ARGUMENT:
 
+        /** @var Node[] $pieces */
         $pieces = [];
 
         CONSUME_PIECE:
 
         $piece =
-            $this->consumeReference($tokens) ??
+            $this->consumeReferenceNode($tokens) ??
             $this->consumeTextNode($tokens) ??
-            $this->consumeRandoCall($tokens);
+            $this->consumeRandoNode($tokens);
 
         if($piece !== NULL){
             $pieces[] = $piece;
@@ -120,7 +122,13 @@ class Parser
             $token instanceof BlockSeparatorToken
         );
 
-
+        if(count($pieces) === 1){
+            if(
+                $pieces[0] instanceof TextNode &&
+                count($pieces[0]->pieces()) === 1
+            ){
+                if($pieces[0]->
+            $pieces->
         $wsBefore = new StringToken("");
         $wsAfter = new StringToken("");
 

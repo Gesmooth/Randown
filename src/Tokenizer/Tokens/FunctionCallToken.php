@@ -2,6 +2,8 @@
 
 namespace Sbludufunk\Randown\Tokenizer\Tokens;
 
+use Sbludufunk\Randown\Tools\CountNewlines;
+
 class FunctionCallToken implements Token
 {
     private $_whitespaceBeforeAmpersand;
@@ -25,10 +27,9 @@ class FunctionCallToken implements Token
     }
 
     public function newlines(): Int{
-        return 1;
-        $res = preg_split("@\r\n|\n|\r|\f@", "hello \n world \f\r\n ciao");
-
-print_r($res);
+        return CountNewlines::call(
+            $this->_whitespaceBeforeAmpersand . $this->_whitespaceAfterAmpersand
+        );
     }
 
     public function __toString(): String{

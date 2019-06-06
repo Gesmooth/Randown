@@ -10,6 +10,7 @@ use Sbludufunk\Randown\Tokenizer\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\Token;
 use function array_column;
 use function preg_match;
 use const PREG_SPLIT_NO_EMPTY;
@@ -54,6 +55,7 @@ class Tokenizer
         $this->_splitPattern = implode("|", array_column($this->_patterns, 1));
     }
 
+    /** @return Token[] */
     public function tokenize(String $document): array{
 
         $rawTokens = preg_split(

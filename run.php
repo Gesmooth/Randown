@@ -5,7 +5,6 @@ use Sbludufunk\Randown\Evaluator\Classes\Functions\IncFunction;
 use Sbludufunk\Randown\Evaluator\Classes\Functions\IntFunction;
 use Sbludufunk\Randown\Evaluator\Classes\Functions\RandoIntFunction;
 use Sbludufunk\Randown\Evaluator\Classes\Functions\VarFunction;
-use Sbludufunk\Randown\Evaluator\Classes\Objecto;
 use Sbludufunk\Randown\Evaluator\Classes\PrivateConstructors\TextClass;
 use Sbludufunk\Randown\Evaluator\Classes\PublicConstructors\SeqClass;
 use Sbludufunk\Randown\Evaluator\Engine;
@@ -13,22 +12,24 @@ use Sbludufunk\Randown\Parser\DebuggingTokenStream;
 use Sbludufunk\Randown\Parser\NodesValidator;
 use Sbludufunk\Randown\Parser\Parser;
 use Sbludufunk\Randown\Tokenizer\Tokenizer;
-use Sbludufunk\Randown\Tokenizer\TokenValidator;
+use Sbludufunk\Randown\Tokenizer\TokenizerFunctions;
 
 require __DIR__ . "/vendor/autoload.php";
 
 $source = file_get_contents(__DIR__ . "/source.md");
-$tokenizer = new Tokenizer();
-$tokens = $tokenizer->tokenize($source);
+
+$tokens = (new Tokenizer())->tokenize($source);
 
 foreach($tokens as $index => $token){
     $cn = (new RC($token))->getShortName();
     echo str_pad($cn, 30) . $index . " - ";
-    var_dump((String)$token);
+    echo str_replace(["\r\n", "\r", "\n"], "\\n", (String)$token);
+    echo "\n";
 }
 
-$tokenValidator = new TokenValidator($tokenizer);
-var_dump($tokenValidator->isTokenSequenceValid($tokens));
+var_dump((new TokenizerFunctions())->findTokenLine($tokens, $tokens[12]));
+
+exit();
 
 $parser = new Parser();
 $nodes = $parser->parse(new DebuggingTokenStream($tokens));

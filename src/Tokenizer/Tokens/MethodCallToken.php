@@ -2,6 +2,8 @@
 
 namespace Sbludufunk\Randown\Tokenizer\Tokens;
 
+use Sbludufunk\Randown\Tools\CountNewlines;
+
 class MethodCallToken implements Token
 {
     private $_whitespaceBeforeAmpersand;
@@ -38,6 +40,15 @@ class MethodCallToken implements Token
 
     public function whitespaceAfterName(): String{
         return $this->_whitespaceAfterName;
+    }
+
+    public function newlines(): Int{
+        return CountNewlines::call(
+            $this->_whitespaceBeforeAmpersand .
+            $this->_whitespaceBeforeName .
+            $this->_name .
+            $this->_whitespaceAfterName
+        );
     }
 
     public function __toString(): String{
