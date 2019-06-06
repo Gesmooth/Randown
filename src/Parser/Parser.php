@@ -100,6 +100,12 @@ class Parser
 
         CONSUME_ARGUMENT:
 
+        $wsBefore = NULL;
+        $token = $tokens->peek();
+        if($token instanceof StringToken && $token->isWhitespace()){
+            $wsBefore = $tokens->consume();
+        }
+
         /** @var Node[] $pieces */
         $pieces = [];
 
@@ -121,16 +127,6 @@ class Parser
             $token instanceof BlockEndToken ||
             $token instanceof BlockSeparatorToken
         );
-
-        if(count($pieces) === 1){
-            if(
-                $pieces[0] instanceof TextNode &&
-                count($pieces[0]->pieces()) === 1
-            ){
-                if($pieces[0]->
-            $pieces->
-        $wsBefore = new StringToken("");
-        $wsAfter = new StringToken("");
 
         $arguments[] = new ArgumentNode($wsBefore, $pieces, $wsAfter);
 
