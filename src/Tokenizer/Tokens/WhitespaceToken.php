@@ -3,9 +3,8 @@
 namespace Sbludufunk\Randown\Tokenizer\Tokens;
 
 use Sbludufunk\Randown\Tools\CountNewlines;
-use function preg_match;
 
-class StringToken implements Token
+class WhitespaceToken implements Token
 {
     private $_string;
 
@@ -15,10 +14,6 @@ class StringToken implements Token
 
     public function string(): String{
         return $this->_string;
-    }
-
-    public function isWhitespace(): Bool{
-        return preg_match("@^[\n\r\f\t ]+$@", $this->_string);
     }
 
     public function newlines(): Int{

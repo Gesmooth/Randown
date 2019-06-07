@@ -2,6 +2,8 @@
 
 namespace Sbludufunk\Randown\Parser\Nodes;
 
+use Sbludufunk\Randown\Tokenizer\Tokens\WhitespaceToken;
+
 class ArgumentNode implements Node
 {
     private $_whitespaceBefore;
@@ -11,16 +13,16 @@ class ArgumentNode implements Node
     private $_whitespaceAfter;
 
     public function __construct(
-        ?TextNode $whitespaceBefore,
+        ?WhitespaceToken $whitespaceBefore,
         Array $contents,
-        ?TextNode $whitespaceAfter
+        ?WhitespaceToken $whitespaceAfter
     ){
         $this->_whitespaceBefore = $whitespaceBefore;
         $this->_contents = $contents;
         $this->_whitespaceAfter = $whitespaceAfter;
     }
 
-    public function whitespaceBefore(): TextNode{
+    public function whitespaceBefore(): ?WhitespaceToken{
         return $this->_whitespaceBefore;
     }
 
@@ -28,7 +30,7 @@ class ArgumentNode implements Node
         return $this->_contents;
     }
 
-    public function whitespaceAfter(): TextNode{
+    public function whitespaceAfter(): ?WhitespaceToken{
         return $this->_whitespaceAfter;
     }
 

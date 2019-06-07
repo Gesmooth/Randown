@@ -3,7 +3,7 @@
 namespace Sbludufunk\Randown\Parser\Nodes;
 
 use Sbludufunk\Randown\Tokenizer\Tokens\EscapeToken;
-use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\WordToken;
 use function array_reduce;
 
 class TextNode implements ValidRootNode
@@ -19,7 +19,7 @@ class TextNode implements ValidRootNode
 
     public function unescape(): String{
         return array_reduce($this->_pieces, function(String $carry, $piece){
-            assert($piece instanceof EscapeToken || $piece instanceof StringToken);
+            assert($piece instanceof EscapeToken || $piece instanceof WordToken);
             return $carry . $piece->string();
         }, "");
     }

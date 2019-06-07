@@ -9,7 +9,8 @@ use Sbludufunk\Randown\Tokenizer\Tokens\EscapeToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
-use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\WhitespaceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\WordToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\Token;
 use function array_column;
 use function preg_match;
@@ -48,6 +49,12 @@ class Tokenizer
             "(\\s*)   \\&   (\\s*)   (..*?)   (\\s*)   \\{"
         ];
 
+        $this->_patterns[] = [
+            WhitespaceToken::CLASS,
+            " \\s+",
+            "(\\s+)"
+        ];
+
         $this->_patterns[] = [BlockSeparatorToken::CLASS, "\\|", "\\|"];
         $this->_patterns[] = [BlockStartToken::CLASS,     "\\{", "\\{"];
         $this->_patterns[] = [BlockEndToken::CLASS,       "\\}", "\\}"];
@@ -73,7 +80,7 @@ class Tokenizer
                     continue 2;
                 }
             }
-            $tokens[] = new StringToken($rawToken);
+            $tokens[] = new WordToken($rawToken);
         }
 
         return $tokens;

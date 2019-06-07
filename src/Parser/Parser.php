@@ -18,7 +18,8 @@ use Sbludufunk\Randown\Tokenizer\Tokens\EscapeToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\FunctionCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\MethodCallToken;
 use Sbludufunk\Randown\Tokenizer\Tokens\ReferenceToken;
-use Sbludufunk\Randown\Tokenizer\Tokens\StringToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\WhitespaceToken;
+use Sbludufunk\Randown\Tokenizer\Tokens\WordToken;
 
 class Parser
 {
@@ -35,11 +36,30 @@ class Parser
         return $nodes;
     }
 
+    private function consumeIgnoredWhitespaceBeforeArgument(
+        TokenStream $tokens
+    ): ?WhitespaceToken{
+        $cloneTokens = $tokens->branch();
+        $token = $cloneTokens->consume();
+        if($token instanceof WhitespaceToken){
+            $calls = $this->consumeCalls($cloneTokens);
+            if($calls === []){
+                $tokens->merge($cloneTokens);
+                return $token;
+            }
+        }
+        return NULL;
+    }
+
     private function consumeTextNode(TokenStream $tokens): ?TextNode{
         $pieces = [];
         CONSUME_PIECE:
         $token = $tokens->peek();
-        if($token instanceof StringToken || $token instanceof EscapeToken){
+        if(
+            $token instanceof WhitespaceToken ||
+            $token instanceof WordToken ||
+            $token instanceof EscapeToken
+        ){
             $pieces[] = $tokens->consume();
             goto CONSUME_PIECE;
         }
@@ -100,11 +120,7 @@ class Parser
 
         CONSUME_ARGUMENT:
 
-        $wsBefore = NULL;
-        $token = $tokens->peek();
-        if($token instanceof StringToken && $token->isWhitespace()){
-            $wsBefore = $tokens->consume();
-        }
+        $whitespaceBefore = $this->consumeIgnoredWhitespaceBeforeArgument($tokens);
 
         /** @var Node[] $pieces */
         $pieces = [];
@@ -128,7 +144,7 @@ class Parser
             $token instanceof BlockSeparatorToken
         );
 
-        $arguments[] = new ArgumentNode($wsBefore, $pieces, $wsAfter);
+        $arguments[] = new ArgumentNode($whitespaceBefore, $pieces, $whitespaceAfter);
 
         if($token instanceof BlockSeparatorToken){
             goto CONSUME_ARGUMENT;
