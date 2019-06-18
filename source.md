@@ -1,3 +1,3 @@
 start \$ not a variable \$ $ function name $ & {
 } end
-bobo {} babo
+bobo {} babo & uppercase {}

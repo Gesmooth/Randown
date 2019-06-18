@@ -51,26 +51,6 @@ class Parser
         return NULL;
     }
 
-    private function consumeTextNode(TokenStream $tokens): ?TextNode{
-        $pieces = [];
-        CONSUME_PIECE:
-        $token = $tokens->peek();
-        if(
-            $token instanceof WhitespaceToken ||
-            $token instanceof WordToken ||
-            $token instanceof EscapeToken
-        ){
-            $pieces[] = $tokens->consume();
-            goto CONSUME_PIECE;
-        }
-
-        if($pieces === []){
-            return NULL;
-        }
-
-        return new TextNode($pieces, $this->consumeCalls($tokens));
-    }
-
     private function consumeRandoNode(TokenStream $tokens): ?RandoNode{
         $blockStart = $tokens->peek();
         if(!$blockStart instanceof BlockStartToken){ return NULL; }
@@ -120,38 +100,83 @@ class Parser
 
         CONSUME_ARGUMENT:
 
-        $whitespaceBefore = $this->consumeIgnoredWhitespaceBeforeArgument($tokens);
+        // First off, we need to try consuming the orphan calls,
+        // e.g. $ref$&{argument | &orphan-method{} &also-orphan{} argument | argument }
+        // which are syntax errors that we choose to ignore
+        // note that leading whitespace is included in the calls
+        $orphanCalls = $this->consumeCalls($tokens);
 
-        /** @var Node[] $pieces */
-        $pieces = [];
-
-        CONSUME_PIECE:
-
-        $piece =
-            $this->consumeReferenceNode($tokens) ??
-            $this->consumeTextNode($tokens) ??
-            $this->consumeRandoNode($tokens);
-
-        if($piece !== NULL){
-            $pieces[] = $piece;
-            goto CONSUME_PIECE;
+        // This step aims at skipping the whitespace that appears before the actual
+        // argument, if any
+        /** @var WhitespaceToken|NULL $whitespaceBefore */
+        $whitespaceBefore = NULL;
+        if($tokens->peek() instanceof WhitespaceToken){
+            $whitespaceBefore = $tokens->consume();
         }
 
-        $token = $tokens->consume();
-        assert(
+        /** @var Node[] $argumentPieces */
+        $argumentPieces = [];
+        CONSUME_ARGUMENT_PIECE:
+
+        // Next we try to consume any sequence of reference nodes and rando nodes
+        // followed by their relative calls
+        $argumentPiece = $this->consumeReferenceNode($tokens);
+        $argumentPiece = $argumentPiece ?? $this->consumeRandoNode($tokens);
+        if($argumentPiece !== NULL){
+            $argumentPieces[] = $argumentPiece;
+            goto CONSUME_ARGUMENT_PIECE;
+        }
+
+        // At this point the next token can be an argument terminator (i.e. block-end,
+        // block-separator or NULL) or a textnode token (i.e. a whitespace, a word,
+        // or an escape)
+
+        // In a branch, check whether the next token is an argument terminator,
+        // ignoring a leading whitespace token if any
+        /** @var WhitespaceToken|NULL $whitespaceAfter */
+        $whitespaceAfter = NULL;
+        $terminateArgumentBranch = $tokens->branch();
+        $token = $terminateArgumentBranch->consume();
+        if($token instanceof WhitespaceToken){
+            $whitespaceAfter = $token;
+            $token = $terminateArgumentBranch->consume();
+        }
+        if(
             $token === NULL ||
             $token instanceof BlockEndToken ||
             $token instanceof BlockSeparatorToken
-        );
+        ){
+            // Since we have found an argument terminator, we finalzie the branch in the
+            // $tokens main.
+            $tokens->merge($terminateArgumentBranch);
 
-        $arguments[] = new ArgumentNode($whitespaceBefore, $pieces, $whitespaceAfter);
+            // If it is an argument terminator, append it to the list of collected arguments
+            $arguments[] = new ArgumentNode($whitespaceBefore, $argumentPieces, $whitespaceAfter);
 
-        if($token instanceof BlockSeparatorToken){
-            goto CONSUME_ARGUMENT;
-        }elseif($token instanceof BlockEndToken){
-            return new ArgumentsNode($arguments, TRUE);
+            if($token === NULL){
+                // If the token stream is now empty, return the arguments
+                return new ArgumentsNode($arguments, FALSE);
+            }elseif($token instanceof BlockEndToken){
+                // If the {} block is complete, return the arguments
+                return new ArgumentsNode($arguments, TRUE);
+            }else{// BlockSeparatorToken
+                // Otherwise an argument separator means we need to proceed collecting
+                // another argument
+                goto CONSUME_ARGUMENT;
+            }
         }
 
-        return new ArgumentsNode($arguments, FALSE);
+        // Instead, if the token is not an argument terminator, we scratch the
+        // $terminateArgumentBranch and we continue using the $tokens one. Reached this
+        // step, the next token can be any of a text node (word, whitespace and escape)
+        // and we are sure it's not a whitespace followed by an argument terminator
+        $token = $tokens->consume();
+
+
+        $calls = $this->consumeCalls($tokens);
+
+
+
+
     }
 }
